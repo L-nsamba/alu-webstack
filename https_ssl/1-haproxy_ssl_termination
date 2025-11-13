@@ -1,0 +1,26 @@
+global
+    daemon
+    maxconn 256
+    ssl-default-bind-ciphers ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256
+    ssl-default-bind-options no-sslv3 no-tlsv10 no-tlsv11
+
+defaults
+    mode http
+    timeout connect 5000ms
+    timeout client 50000ms
+    timeout server 50000ms
+    option forwardfor
+    option http-server-close
+
+frontend https_front
+    bind *:443 ssl crt /etc/letsencrypt/live/www.leonnsamba.tech/haproxy.pem
+    default_backend web_servers
+
+frontend http_front
+    bind *:80
+    redirect scheme https code 301 if !{ ssl_fc }
+
+backend web_servers
+    balance roundrobin
+    server web-01 52.87.192.192:80 check
+    server web-02 52.91.235.48:80 check
