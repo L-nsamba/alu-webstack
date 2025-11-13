@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+# Function to get DNS information for a subdomain
+get_dns_info() {
+    local domain="$1"
+    local subdomain="$2"
+    
+    # Use dig to get DNS information
+    # shellcheck disable=SC2086
+    dig_output=$(dig "$subdomain.$domain" +short)
+    
+    # Extract destination
+    destination=$(echo "$dig_output" | awk 'NR==1{print $1}')
+    
+    # Output the result
+    echo "The subdomain $subdomain is a A record and points to $destination"
+}
+
+# Main script logic
+main() {
+    local domain="$1"
+    local subdomain="$2"
+    
+    # If only domain is provided, check the four specific subdomains in order
+    if [ $# -eq 1 ]; then
+        for sub in www lb-01 web-01 web-02; do
+            get_dns_info "$domain" "$sub"
+        done
+    # If both domain and subdomain are provided, check only that subdomain
+    elif [ $# -eq 2 ]; then
+        get_dns_info "$domain" "$subdomain"
+    fi
+}
+
+# Call main function with all arguments
+main "$@"
