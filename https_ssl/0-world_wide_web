@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # Function to get DNS information for a subdomain
 get_dns_info() {
     local domain="$1"
